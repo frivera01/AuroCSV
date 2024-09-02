@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detector y Corrector de Anomalías en CSV para envios SMS, Blaster y WhatsApp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="/static/script.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Detector y Corrector de Anomalías en Archivos CSV</h1>
+
+        <div class="intro">
+            <p>Bienvenido a la herramienta de detección y corrección de anomalías en archivos CSV. Esta aplicación está diseñada para ayudarte a identificar y corregir errores comunes en archivos CSV que se utilizan en el procesamiento de datos.</p>
+            
+            <h2>Instrucciones de uso:</h2>
+            <ul>
+                <li>Asegúrate de que tu archivo CSV esté codificado en ANSI (Archivo Delimitado por Comas).</li>
+                <li>El archivo debe contener una cabecera llamada <strong>"TELEFONO"</strong>.</li>
+                <li>Sube el archivo CSV utilizando el botón de carga y presiona "Subir y Verificar".</li>
+                <li>El sistema analizará el archivo y mostrará las anomalías encontradas.</li>
+                <li>Si se encuentran anomalías, tendrás la opción de descargar un archivo corregido.</li>
+            </ul>
+
+            <h2>Posibles errores que puede detectar:</h2>
+            <ul>
+                <li><strong>Espacios en blanco innecesarios:</strong> Detecta y corrige espacios adicionales al inicio o al final de los valores.</li>
+                <li><strong>Saltos de línea:</strong> Identifica y elimina saltos de línea dentro de los campos de texto.</li>
+                <li><strong>Cabecera faltante:</strong> Verifica que el archivo contenga la cabecera "TELEFONO".</li>
+                <li><strong>Codificación incorrecta:</strong> Asegura que el archivo esté en formato ANSI.</li>
+            </ul>
+        </div>
+
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".csv" required>
+            <button type="submit" class="btn-submit">Subir y Verificar</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if anomalies %}
+            <div class="anomalies">
+                <h2>Se encontraron las siguientes anomalías:</h2>
+                <table>
+                    <tr>
+                        <th>Fila</th>
+                        <th>Columna</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                    </tr>
+                    {% for anomaly in anomalies %}
+                    <tr>
+                        <td>{{ anomaly[0] }}</td>
+                        <td>{{ anomaly[1] }}</td>
+                        <td>{{ anomaly[2] }}</td>
+                        <td>{{ anomaly[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <div class="btn-container">
+                    <a href="{{ url_for('download_file') }}" class="btn-download">Descargar Archivo Corregido</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.querySelector('input[type="file"]').addEventListener('change', function(event) {
+            var fileName = event.target.files[0].name;
+            alert('Archivo seleccionado: ' + fileName);
+        });
+    </script>
+</body>
+</html>
